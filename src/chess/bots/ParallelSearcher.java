@@ -21,26 +21,29 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 	@SuppressWarnings("unchecked")
 	static <M extends Move<M>, B extends Board<M, B>> BestMove<M> minimax(Evaluator<B> evaluator, B board, int depth) {
         List<M> moves = board.generateMoves();
-        M[] arr = (M[]) moves.toArray();
-        return searchBestMove(arr, board);
+        Move<M>[] arr = (Move<M>[]) new Move[moves.size()];
+        for (int i = 0; i < moves.size(); i++) {
+        	arr[i] = moves.get(i);
+        }
+        return (BestMove<M>) searchBestMove(arr, board);
     }
     
     private static final int DIVIDE_CUTOFF = 2; // Maybe = to depth?
 	@SuppressWarnings("serial")
 	private static class SearchTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
-    	int lo; int hi; M[] arr; B board; Evaluator<B> evaluator;
+    	int lo; int hi; Move<M>[] arr; B board; Evaluator<B> evaluator; int cutoff;
     	
     	SearchTask(M[] arr, int lo, int hi, B board) {
     		this.arr = arr;
     		this.lo = lo;
     		this.hi = hi;
-    		this.board = board;
+    		this.board = board;    		
     	}
     	
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		protected BestMove<M> compute() {
 			if (hi - lo <= DIVIDE_CUTOFF) {
-				return SimpleSearcher.minimax(evaluator, board, hi - lo); // What is the depth?
+				SimpleSearcher.minimax(evaluator, board, cutoff);
 			}
 			
 			int mid = lo + (hi - lo) / 2;
@@ -59,7 +62,7 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
     
     static final ForkJoinPool POOL = new ForkJoinPool();
     @SuppressWarnings({ "unchecked", "rawtypes" })
-	public static <M extends Move<M>, B extends Board<M, B>> BestMove<M> searchBestMove(M[] arr, B board) {
+	public static <M extends Move<M>, B extends Board<M, B>> BestMove<M> searchBestMove(Move<M>[] arr, B board) {
     	SearchTask task = new SearchTask(arr, 0, arr.length, board);
     	return POOL.invoke(task);
     }
