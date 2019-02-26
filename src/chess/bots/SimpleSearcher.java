@@ -24,6 +24,9 @@ public class SimpleSearcher<M extends Move<M>, B extends Board<M, B>> extends
     	if (board == null) {
     		throw new IllegalArgumentException();
     	}
+        if (depth == 0) {
+        	return new BestMove(evaluator.eval(board));
+        } 
         List<M> moves = board.generateMoves();
         if (moves.isEmpty()) {
         	if (board.inCheck()) {
@@ -31,18 +34,7 @@ public class SimpleSearcher<M extends Move<M>, B extends Board<M, B>> extends
         	} else {
         		return new BestMove(-evaluator.stalemate());
         	}
-        } else if (depth == 0) {
-        	return new BestMove(evaluator.eval(board));
         }
-//        if (depth == 0) {
-//        	return new BestMove(evaluator.eval(board));
-//        } else if (moves.isEmpty()) {
-//        	if (board.inCheck()) {
-//        		return new BestMove(-evaluator.mate() - depth);
-//        	} else {
-//        		return new BestMove(-evaluator.stalemate());
-//        	}
-//        }
         int bestValue = -evaluator.infty();
         M bestMove = null;
         for (M move : moves) {
