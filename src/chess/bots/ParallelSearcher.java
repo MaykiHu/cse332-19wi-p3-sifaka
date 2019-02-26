@@ -24,7 +24,7 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
         for (int i = 0; i < moves.size(); i++) {
         	arr[i] = moves.get(i);
         }
-        return (BestMove<M>) searchBestMove(arr, board, depth, -evaluator.infty(), evaluator);
+        return (BestMove<M>) searchBestMove(arr, board, 2 * depth, -evaluator.infty(), evaluator);
     }
     
     private static final int DIVIDE_CUTOFF = 2; // Maybe = to depth?
@@ -46,9 +46,19 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		protected BestMove<M> compute() {
 			if (hi - lo <= DIVIDE_CUTOFF) {
-				SimpleSearcher.minimax(evaluator, board, cutoff);
+//				SimpleSearcher.minimax(evaluator, board, cutoff);
+				/*
+				 * We're supposed to apply move and create new boards in parallel
+				 * We have to apply move here and make new boards
+				 * Copying board and generating move is very expensive, so when we get we want to
+				 * generate move in child not in parent 
+				 */
 			} else if (depth <= cutoff) {
 				SimpleSearcher.minimax(evaluator, board, depth);
+				/*
+				 * This is our base case, if we're not at it, we want to check this first, reorder
+				 * switch with top if statement
+				 */
 			}
 			int bestValue = -evaluator.infty();
 			int mid = lo + (hi - lo) / 2;
