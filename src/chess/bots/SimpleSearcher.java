@@ -22,8 +22,11 @@ public class SimpleSearcher<M extends Move<M>, B extends Board<M, B>> extends
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
 	static <M extends Move<M>, B extends Board<M, B>> BestMove<M> minimax(Evaluator<B> evaluator, B board, int depth) {
+    	if (board == null) {
+    		throw new IllegalArgumentException();
+    	}
         List<M> moves = board.generateMoves();
-        if (moves.isEmpty() ) {
+        if (moves.isEmpty()) {
         	if (board.inCheck()) {
         		return new BestMove(-evaluator.mate() - depth);
         	} else {

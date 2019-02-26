@@ -25,7 +25,7 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
         for (int i = 0; i < moves.size(); i++) {
         	arr[i] = moves.get(i);
         }
-        return (BestMove<M>) searchBestMove(arr, board);
+        return (BestMove<M>) searchBestMove(arr, board, depth);
     }
     
     private static final int DIVIDE_CUTOFF = 2; // Maybe = to depth?
@@ -33,11 +33,12 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 	private static class SearchTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
     	int lo; int hi; Move<M>[] arr; B board; Evaluator<B> evaluator; int cutoff; int depth;
     	
-    	SearchTask(M[] arr, int lo, int hi, B board) {
+    	SearchTask(M[] arr, int lo, int hi, B board, int depth) {
     		this.arr = arr;
     		this.lo = lo;
     		this.hi = hi;
-    		this.board = board;    		
+    		this.board = board;    	
+    		this.depth = depth;
     	}
     	
 		@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -49,8 +50,8 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 			}
 			
 			int mid = lo + (hi - lo) / 2;
-			SearchTask left = new SearchTask(arr, lo, mid, board);
-			SearchTask right = new SearchTask(arr, mid, hi, board);
+			SearchTask left = new SearchTask(arr, lo, mid, board, depth - 1);
+			SearchTask right = new SearchTask(arr, mid, hi, board, depth - 1);
 			left.fork();
 			BestMove<M> rightBest = right.compute();
 			BestMove<M> leftBest = (BestMove<M>) left.join();
@@ -64,8 +65,8 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
     
     static final ForkJoinPool POOL = new ForkJoinPool();
     @SuppressWarnings({ "unchecked", "rawtypes" })
-	public static <M extends Move<M>, B extends Board<M, B>> BestMove<M> searchBestMove(Move<M>[] arr, B board) {
-    	SearchTask task = new SearchTask(arr, 0, arr.length, board);
+	public static <M extends Move<M>, B extends Board<M, B>> BestMove<M> searchBestMove(Move<M>[] arr, B board, int depth) {
+    	SearchTask task = new SearchTask(arr, 0, arr.length, board, depth);
     	return POOL.invoke(task);
     }
 }
