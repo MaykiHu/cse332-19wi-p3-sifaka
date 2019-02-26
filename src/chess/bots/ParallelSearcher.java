@@ -31,7 +31,7 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
     private static final int DIVIDE_CUTOFF = 2; // Maybe = to depth?
 	@SuppressWarnings("serial")
 	private static class SearchTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
-    	int lo; int hi; Move<M>[] arr; B board; Evaluator<B> evaluator; int cutoff;
+    	int lo; int hi; Move<M>[] arr; B board; Evaluator<B> evaluator; int cutoff; int depth;
     	
     	SearchTask(M[] arr, int lo, int hi, B board) {
     		this.arr = arr;
@@ -44,6 +44,8 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 		protected BestMove<M> compute() {
 			if (hi - lo <= DIVIDE_CUTOFF) {
 				SimpleSearcher.minimax(evaluator, board, cutoff);
+			} else if (depth <= cutoff) {
+				
 			}
 			
 			int mid = lo + (hi - lo) / 2;
