@@ -16,8 +16,7 @@ public class SimpleSearcher<M extends Move<M>, B extends Board<M, B>> extends
 
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
-        BestMove<M> best = minimax(this.evaluator, board, ply);
-        return best.move;
+        return minimax(this.evaluator, board, ply).move;
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })

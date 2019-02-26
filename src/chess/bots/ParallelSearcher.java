@@ -14,8 +14,7 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
         AbstractSearcher<M, B> {
     public M getBestMove(B board, int myTime, int opTime) {
     	/* Calculate the best move */
-        BestMove<M> best = minimax(this.evaluator, board, ply);
-        return best.move;
+        return minimax(this.evaluator, board, ply).move;
     }
     
 	@SuppressWarnings("unchecked")
@@ -29,6 +28,7 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
     }
     
     private static final int DIVIDE_CUTOFF = 2; // Maybe = to depth?
+    private static final ForkJoinPool POOL = new ForkJoinPool();
 	@SuppressWarnings("serial")
 	private static class SearchTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
     	int lo; int hi; Move<M>[] arr; B board; Evaluator<B> evaluator; int cutoff; int depth;
@@ -63,7 +63,6 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 		}
     }
     
-    static final ForkJoinPool POOL = new ForkJoinPool();
     @SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <M extends Move<M>, B extends Board<M, B>> BestMove<M> searchBestMove(Move<M>[] arr, B board, int depth) {
     	SearchTask task = new SearchTask(arr, 0, arr.length, board, depth);
