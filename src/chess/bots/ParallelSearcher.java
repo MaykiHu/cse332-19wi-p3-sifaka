@@ -24,7 +24,7 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
         for (int i = 0; i < moves.size(); i++) {
         	arr[i] = moves.get(i);
         }
-        return (BestMove<M>) searchBestMove(arr, board, depth, cutoff, evaluator);
+        return searchBestMove(arr, board, depth, cutoff, evaluator);
     }
     
     private static final int DIVIDE_CUTOFF = 2; // Maybe = to depth?
@@ -71,7 +71,6 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 				for (int i = 0; i < hi - lo; i++) {
 					tasks[i] = new SearchTask(arr[i].copy(), board, depth - 1, cutoff, evaluator);
 					tasks[i].fork();
-					tasks[i].compute();
 				}
 				for (int i = 0; i < tasks.length; i++) {
 					tasks[i].join();
@@ -95,6 +94,6 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 	public static <M extends Move<M>, B extends Board<M, B>> BestMove<M> searchBestMove(
 			 Move<M>[] arr, B board, int depth, int cutoff, Evaluator<B> evaluator) {
     	SearchTask task = new SearchTask(arr, 0, arr.length, board, depth, cutoff, evaluator);
-    	return POOL.invoke(task);
+    	return (BestMove<M>) POOL.invoke(task);
     }
 }
