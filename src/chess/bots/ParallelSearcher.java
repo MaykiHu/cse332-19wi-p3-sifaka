@@ -64,9 +64,16 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 					tasks[i] = new SearchTask(moves.get(i), moves, board, depth, cutoff, evaluator);
 					tasks[i].fork();
 				}
+				int bestValue = -evaluator.infty();
+				BestMove<M> bestMove = null;
 				for (int i = 0; i < tasks.length; i++) {
-					tasks[i].join();
+					BestMove<M> move = (BestMove<M>) tasks[i].join();
+					if (move.value > bestValue) {
+						bestValue = move.value;
+						bestMove = move;
+					}
 				}
+				return bestMove;
 			}
 			int mid = lo + (hi - lo) / 2;
 			SearchTask left = new SearchTask(moves, lo, mid, board, depth, cutoff, evaluator);
