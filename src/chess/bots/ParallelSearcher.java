@@ -14,73 +14,87 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
         AbstractSearcher<M, B> {
     public M getBestMove(B board, int myTime, int opTime) {
     	/* Calculate the best move */
-        return minimax(this.evaluator, board, ply).move;
+        return minimax(this.evaluator, board, ply, super.cutoff).move;
     }
     
 	@SuppressWarnings("unchecked")
-	static <M extends Move<M>, B extends Board<M, B>> BestMove<M> minimax(Evaluator<B> evaluator, B board, int depth) {
+	static <M extends Move<M>, B extends Board<M, B>> BestMove<M> minimax(Evaluator<B> evaluator, B board, int depth, int cutoff) {
         List<M> moves = board.generateMoves();
         Move<M>[] arr = (Move<M>[]) new Move[moves.size()];
         for (int i = 0; i < moves.size(); i++) {
         	arr[i] = moves.get(i);
         }
-        return (BestMove<M>) searchBestMove(arr, board, 2 * depth, -evaluator.infty(), evaluator);
+        return (BestMove<M>) searchBestMove(arr, board, depth, cutoff, evaluator);
     }
     
     private static final int DIVIDE_CUTOFF = 2; // Maybe = to depth?
     private static final ForkJoinPool POOL = new ForkJoinPool();
 	@SuppressWarnings("serial")
 	private static class SearchTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
-    	int lo; int hi; Move<M>[] arr; B board; Evaluator<B> evaluator; int cutoff; int depth; int bestValue;
+    	int lo; int hi; Move<M>[] arr; B board; Evaluator<B> evaluator; int cutoff; int depth;
     	
-    	SearchTask(M[] arr, int lo, int hi, B board, int depth, int bestValue, Evaluator<B> evaluator) {
+    	SearchTask(M[] arr, int lo, int hi, B board, int depth, int cutoff, Evaluator<B> evaluator) {
     		this.arr = arr;
     		this.lo = lo;
     		this.hi = hi;
     		this.board = board;    	
     		this.depth = depth;
-    		this.bestValue = bestValue;
     		this.evaluator = evaluator;
+    		this.cutoff = cutoff;
+    	}
+    	
+    	@SuppressWarnings("unchecked")
+		SearchTask(Move<M> move, B board, int depth, int cutoff, Evaluator<B> evaluator) {
+    		B newBoard = board.copy();
+    		newBoard.applyMove(move.copy());
+    		List<M> newMoves = newBoard.generateMoves();
+    		Move<M>[] newArr = (Move<M>[]) new Move[newMoves.size()];
+            for (int i = 0; i < newMoves.size(); i++) {
+            	newArr[i] = newMoves.get(i);
+            }
+            arr = newArr;
+            this.depth = depth;
+            this.board = newBoard;
+            this.depth = depth;
+            this.cutoff = cutoff;
+            this.evaluator = evaluator;
+            this.lo = 0;
+            this.hi = arr.length;
     	}
     	
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		protected BestMove<M> compute() {
-			if (hi - lo <= DIVIDE_CUTOFF) {
-//				SimpleSearcher.minimax(evaluator, board, cutoff);
-				/*
-				 * We're supposed to apply move and create new boards in parallel
-				 * We have to apply move here and make new boards
-				 * Copying board and generating move is very expensive, so when we get we want to
-				 * generate move in child not in parent 
-				 */
-			} else if (depth <= cutoff) {
+			if (depth <= cutoff) {
 				SimpleSearcher.minimax(evaluator, board, depth);
-				/*
-				 * This is our base case, if we're not at it, we want to check this first, reorder
-				 * switch with top if statement
-				 */
+			} else if (hi - lo <= DIVIDE_CUTOFF) {
+				SearchTask[] tasks = new SearchTask[hi - lo];
+				for (int i = 0; i < hi - lo; i++) {
+					tasks[i] = new SearchTask(arr[i].copy(), board, depth - 1, cutoff, evaluator);
+					tasks[i].fork();
+					tasks[i].compute();
+				}
+				for (int i = 0; i < tasks.length; i++) {
+					tasks[i].join();
+				}
 			}
-			int bestValue = -evaluator.infty();
 			int mid = lo + (hi - lo) / 2;
-			SearchTask left = new SearchTask(arr, lo, mid, board, depth - 1, bestValue, evaluator);
-			SearchTask right = new SearchTask(arr, mid, hi, board, depth - 1, bestValue, evaluator);
+			SearchTask left = new SearchTask(arr, lo, mid, board, depth, cutoff, evaluator);
+			SearchTask right = new SearchTask(arr, mid, hi, board, depth, cutoff, evaluator);
 			left.fork();
 			BestMove<M> rightBest = right.compute();
 			BestMove<M> leftBest = (BestMove<M>) left.join();
 			if (rightBest.value > leftBest.value) {
-				bestValue = rightBest.value;
-				return right.compute();
+				return rightBest;
 			} else {
-				bestValue = leftBest.value;
-				return (BestMove<M>) left.join();
+				return leftBest;
 			}
 		}
     }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <M extends Move<M>, B extends Board<M, B>> BestMove<M> searchBestMove(
-			 Move<M>[] arr, B board, int depth, int bestValue, Evaluator<B> evaluator) {
-    	SearchTask task = new SearchTask(arr, 0, arr.length, board, depth, bestValue, evaluator);
+			 Move<M>[] arr, B board, int depth, int cutoff, Evaluator<B> evaluator) {
+    	SearchTask task = new SearchTask(arr, 0, arr.length, board, depth, cutoff, evaluator);
     	return POOL.invoke(task);
     }
 }
