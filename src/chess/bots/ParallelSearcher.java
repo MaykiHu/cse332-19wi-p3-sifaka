@@ -22,7 +22,7 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
         return searchBestMove(moves, board, depth, cutoff, evaluator);
     }
     
-    private static final int DIVIDE_CUTOFF = 2; // Maybe = to depth?
+    private static final int DIVIDE_CUTOFF = 2;
     private static final ForkJoinPool POOL = new ForkJoinPool();
 	@SuppressWarnings("serial")
 	private static class SearchTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
@@ -38,9 +38,8 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
     		this.cutoff = cutoff;
     	}
     	
-		SearchTask(M move, List<M> moves, B board, int depth, int cutoff, Evaluator<B> evaluator) {
+		SearchTask(M move, B board, int depth, int cutoff, Evaluator<B> evaluator) {
     		this.move = move;
-    		this.moves = moves;
     		this.board = board;
     		this.depth = depth;
     		this.cutoff = cutoff;
@@ -67,17 +66,18 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 				return SimpleSearcher.minimax(evaluator, board, depth);
 			} else if (hi - lo <= DIVIDE_CUTOFF) {
 				SearchTask[] tasks = new SearchTask[hi - lo];
+				BestMove<M>[] results = (BestMove<M>[]) new BestMove[hi - lo];
 				for (int i = 0; i < hi - lo; i++) {
-					tasks[i] = new SearchTask(moves.get(i + lo), moves, board, depth, cutoff, evaluator);
+					tasks[i] = new SearchTask(moves.get(i + lo), board, depth, cutoff, evaluator);
 					tasks[i].fork();
 				}
 				int bestValue = -evaluator.infty();
 				BestMove<M> bestMove = null;
 				for (int i = 0; i < tasks.length; i++) {
-					BestMove<M> move = (BestMove<M>) tasks[i].join();
-					if (move.value > bestValue) {
-						bestValue = move.value;
-						bestMove = move;
+					results[i] = (BestMove<M>) tasks[i].join();
+					if (results[i].value > bestValue) {
+						bestValue = results[i].value;
+						bestMove = results[i];
 					}
 				}
 				return bestMove;
