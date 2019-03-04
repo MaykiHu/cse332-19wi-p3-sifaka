@@ -55,6 +55,9 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 				SearchTask curr = new SearchTask(newMoves, 0, newMoves.size(), newBoard, depth - 1, cutoff, evaluator);
 				return curr.compute();
 			} 
+	        if (depth == 0) {
+	        	return new BestMove(evaluator.eval(board));
+	        } 
 			if (moves.isEmpty()) {
 				if (board.inCheck()) {
 					return new BestMove<M>(null, -evaluator.mate() - depth);
