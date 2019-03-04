@@ -55,14 +55,15 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 				List<M> newMoves = newBoard.generateMoves();
 				SearchTask curr = new SearchTask(newMoves, 0, newMoves.size(), newBoard, depth - 1, cutoff, evaluator);
 				return curr.compute();
-			}
+			} 
 			if (moves.isEmpty()) {
 				if (board.inCheck()) {
 					return new BestMove<M>(null, -evaluator.mate() - depth);
 				} else {
 					return new BestMove<M>(null, -evaluator.stalemate());
 				}
-			} else if (depth <= cutoff) {
+			} 
+			if (depth <= cutoff) {
 				return SimpleSearcher.minimax(evaluator, board, depth);
 			} else if (hi - lo <= DIVIDE_CUTOFF) {
 				SearchTask[] tasks = new SearchTask[hi - lo];
