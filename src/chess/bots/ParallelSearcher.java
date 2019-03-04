@@ -81,18 +81,18 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 					}
 				}
 				return bestMove;
+			}
+			
+			int mid = lo + (hi - lo) / 2;
+			SearchTask left = new SearchTask(moves, lo, mid, board, depth, cutoff, evaluator);
+			SearchTask right = new SearchTask(moves, mid, hi, board, depth, cutoff, evaluator);
+			left.fork();
+			BestMove<M> rightBest = right.compute();
+			BestMove<M> leftBest = (BestMove<M>) left.join();
+			if (rightBest.value > leftBest.value) {
+				return rightBest;
 			} else {
-				int mid = lo + (hi - lo) / 2;
-				SearchTask left = new SearchTask(moves, lo, mid, board, depth, cutoff, evaluator);
-				SearchTask right = new SearchTask(moves, mid, hi, board, depth, cutoff, evaluator);
-				left.fork();
-				BestMove<M> rightBest = right.compute();
-				BestMove<M> leftBest = (BestMove<M>) left.join();
-				if (rightBest.value > leftBest.value) {
-					return rightBest;
-				} else {
-					return leftBest;
-				}
+				return leftBest;
 			}
 		}
     }
