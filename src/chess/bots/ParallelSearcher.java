@@ -22,7 +22,7 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
         return searchBestMove(moves, board, depth, cutoff, evaluator);
     }
     
-    private static final int DIVIDE_CUTOFF = 10; // Maybe = to depth?
+    private static final int DIVIDE_CUTOFF = 2; // Maybe = to depth?
     private static final ForkJoinPool POOL = new ForkJoinPool();
 	@SuppressWarnings("serial")
 	private static class SearchTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
