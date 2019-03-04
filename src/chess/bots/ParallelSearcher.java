@@ -71,6 +71,7 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 				for (int i = 0; i < hi - lo; i++) {
 					tasks[i] = new SearchTask(arr[i].copy(), board, depth - 1, cutoff, evaluator);
 					tasks[i].fork();
+					tasks[i].compute();
 				}
 				for (int i = 0; i < tasks.length; i++) {
 					tasks[i].join();
