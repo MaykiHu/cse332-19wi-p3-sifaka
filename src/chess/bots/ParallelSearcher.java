@@ -49,7 +49,7 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
     	
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		protected BestMove<M> compute() {
-			if (moves != null) { // Have child apply moves
+			if (move != null) { // Have child apply moves
 				B newBoard = board.copy();
 				newBoard.applyMove(move);
 				List<M> newMoves = newBoard.generateMoves();
