@@ -53,7 +53,7 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 				B newBoard = board.copy();
 				newBoard.applyMove(move);
 				List<M> newMoves = newBoard.generateMoves();
-				SearchTask curr = new SearchTask(newMoves, 0, newMoves.size(), newBoard, depth, cutoff, evaluator);
+				SearchTask curr = new SearchTask(newMoves, 0, newMoves.size(), newBoard, depth - 1, cutoff, evaluator);
 				return curr.compute();
 			}
 			if (depth <= cutoff) {
@@ -61,7 +61,7 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 			} else if (hi - lo <= DIVIDE_CUTOFF) {
 				SearchTask[] tasks = new SearchTask[hi - lo];
 				for (int i = 0; i < hi - lo; i++) {
-					tasks[i] = new SearchTask(moves.get(i), moves, board, depth - 1, cutoff, evaluator);
+					tasks[i] = new SearchTask(moves.get(i), moves, board, depth, cutoff, evaluator);
 					tasks[i].fork();
 				}
 				for (int i = 0; i < tasks.length; i++) {
