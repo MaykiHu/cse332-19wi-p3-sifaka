@@ -49,19 +49,19 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
     	
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		protected BestMove<M> compute() {
-			if (moves.isEmpty()) {
-				if (board.inCheck()) {
-					return new BestMove<M>(null, -evaluator.mate() - depth);
-				} else {
-					return new BestMove<M>(null, -evaluator.stalemate());
-				}
-			}
 			if (move != null) { // Have child apply moves
 				B newBoard = board.copy();
 				newBoard.applyMove(move);
 				List<M> newMoves = newBoard.generateMoves();
 				SearchTask curr = new SearchTask(newMoves, 0, newMoves.size(), newBoard, depth - 1, cutoff, evaluator);
 				return curr.compute();
+			}
+			if (moves.isEmpty()) {
+				if (board.inCheck()) {
+					return new BestMove<M>(null, -evaluator.mate() - depth);
+				} else {
+					return new BestMove<M>(null, -evaluator.stalemate());
+				}
 			}
 			if (depth <= cutoff) {
 				return SimpleSearcher.minimax(evaluator, board, depth);
