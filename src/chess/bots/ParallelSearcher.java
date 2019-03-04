@@ -26,7 +26,7 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
     private static final ForkJoinPool POOL = new ForkJoinPool();
 	@SuppressWarnings("serial")
 	private static class SearchTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
-    	int lo; int hi; List<M> moves; B board; Evaluator<B> evaluator; int cutoff; int depth;
+    	int lo; int hi; List<M> moves; B board; Evaluator<B> evaluator; int cutoff; int depth; M move;
     	
     	SearchTask(List<M> moves, int lo, int hi, B board, int depth, int cutoff, Evaluator<B> evaluator) {
     		this.moves = moves;
@@ -38,28 +38,30 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
     		this.cutoff = cutoff;
     	}
     	
-		SearchTask(Move<M> move, B board, int depth, int cutoff, Evaluator<B> evaluator) {
-    		B newBoard = board.copy();
-    		newBoard.applyMove(move.copy());
-    		List<M> newMoves = newBoard.generateMoves();
-            moves = newMoves;
-            this.depth = depth;
-            this.board = newBoard;
-            this.depth = depth;
-            this.cutoff = cutoff;
-            this.evaluator = evaluator;
-            this.lo = 0;
-            this.hi = moves.size();
+		SearchTask(M move, List<M> moves, B board, int depth, int cutoff, Evaluator<B> evaluator) {
+    		this.move = move;
+    		this.moves = moves;
+    		this.board = board;
+    		this.depth = depth;
+    		this.cutoff = cutoff;
+    		this.evaluator = evaluator;
     	}
     	
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		protected BestMove<M> compute() {
+			if (moves != null) { // Have child apply moves
+				B newBoard = board.copy();
+				newBoard.applyMove(move);
+				List<M> newMoves = newBoard.generateMoves();
+				SearchTask curr = new SearchTask(newMoves, 0, newMoves.size(), newBoard, depth - 1, cutoff, evaluator);
+				return curr.compute();
+			}
 			if (depth <= cutoff) {
 				SimpleSearcher.minimax(evaluator, board, depth);
 			} else if (hi - lo <= DIVIDE_CUTOFF) {
 				SearchTask[] tasks = new SearchTask[hi - lo];
 				for (int i = 0; i < hi - lo; i++) {
-					tasks[i] = new SearchTask(moves.get(i), board.copy(), depth - 1, cutoff, evaluator);
+					tasks[i] = new SearchTask(moves.get(i), moves, board, depth - 1, cutoff, evaluator);
 					tasks[i].fork();
 				}
 				for (int i = 0; i < tasks.length; i++) {
@@ -67,8 +69,8 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 				}
 			}
 			int mid = lo + (hi - lo) / 2;
-			SearchTask left = new SearchTask(moves, lo, mid, board.copy(), depth, cutoff, evaluator);
-			SearchTask right = new SearchTask(moves, mid, hi, board.copy(), depth, cutoff, evaluator);
+			SearchTask left = new SearchTask(moves, lo, mid, board, depth, cutoff, evaluator);
+			SearchTask right = new SearchTask(moves, mid, hi, board, depth, cutoff, evaluator);
 			left.fork();
 			BestMove<M> rightBest = right.compute();
 			BestMove<M> leftBest = (BestMove<M>) left.join();
