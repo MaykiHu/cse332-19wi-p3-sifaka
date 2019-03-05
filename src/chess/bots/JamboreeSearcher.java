@@ -58,6 +58,15 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
         return new BestMove(bestMove, alpha);
     }
 	
+	// if (move != null) copy board
+	// if (depth <= cuttof) run alphabeta
+	// if (new move list) run the first %_SEQ * list.size() moves sequentially, create task and then .compute()
+	// if (movelist size <= Divide_cuttof) for sequentially
+	// else divide and conquer
+	
+	// make sure to return a move from your current board, also if tie, return left one first
+	// make sure to compare %_seq move with divide & conquer move
+	
     private static final int DIVIDE_CUTOFF = 2;
     private static final double PERCENTAGE_SEQUENTIAL = 0.5;
     private static final ForkJoinPool POOL = new ForkJoinPool();
