@@ -121,8 +121,11 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 				BestMove<M>[] results = (BestMove<M>[]) new BestMove[hi - lo];
 				for (int i = 0; i < hi - lo; i++) {
 					tasks[i] = new SearchTask(moves.get(i + lo), board, depth, cutoff, evaluator, alpha, beta);
-					tasks[i].fork();
+					if (i != hi - lo - 1) {
+						tasks[i].fork();
+					}
 				}
+				tasks[hi - lo - 1].compute();
 				for (int i = 0; i < tasks.length; i++) {
 					results[i] = (BestMove<M>) tasks[i].join();
 					if (-results[i].value > alpha) {
