@@ -62,20 +62,18 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 				SearchTask curr = new SearchTask(newMoves, 0, newMoves.size(), newBoard, depth - 1, cutoff, evaluator, alpha, beta);
 				return curr.compute();
 			} 
-			if (lo < (int) (PERCENTAGE_SEQUENTIAL * moves.size())) {
-				M bestMove = null;
-				for (int i = lo; i < (int) (PERCENTAGE_SEQUENTIAL * moves.size()); i++) {
-					BestMove<M> move = compute();
-					if (-move.value > alpha) {
-						alpha = -move.value;
-						bestMove = moves.get(lo);
-					}
-					lo++;
-					if (alpha >= beta) {
-						return new BestMove(bestMove, alpha);
-					}
+			M bestMove = null;
+			for (int i = lo; i < (int) (PERCENTAGE_SEQUENTIAL * moves.size()); i++) {
+				BestMove<M> move = (BestMove<M>) 
+						new SearchTask(moves.get(i), board, depth, cutoff, evaluator, alpha, beta).fork().join();
+				if (-move.value > alpha) {
+					alpha = -move.value;
+					bestMove = moves.get(lo);
 				}
-				return new BestMove(bestMove, alpha);
+				lo++;
+				if (alpha >= beta) {
+					return new BestMove(bestMove, alpha);
+				}
 			}
 			if (depth <= cutoff) {
 				return AlphaBetaSearcher.alphabeta(evaluator, board, depth, alpha, beta);
@@ -87,7 +85,6 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 					tasks[i].fork();
 				}
 				tasks[hi - lo - 1].compute();
-				M bestMove = null;
 				for (int i = 0; i < tasks.length; i++) {
 					results[i] = (BestMove<M>) tasks[i].join();
 					if (-results[i].value > alpha) {
