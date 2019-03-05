@@ -86,9 +86,19 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 				}
 				return new BestMove(bestMove, alpha);
 			} else if (lo < (int) (PERCENTAGE_SEQUENTIAL * moves.size())) {
-				BestMove<M> move = compute();
-				lo++;
-				return move;
+				M bestMove = null;
+				for (int i = lo; i < (int) (PERCENTAGE_SEQUENTIAL * moves.size()); i++) {
+					BestMove<M> move = compute();
+					if (-move.value > alpha) {
+						alpha = -move.value;
+						bestMove = moves.get(lo);
+					}
+					lo++;
+					if (alpha >= beta) {
+						return new BestMove(bestMove, alpha);
+					}
+				}
+				return new BestMove(bestMove, alpha);
 			} else {
 				int mid = lo + (hi - lo) / 2;
 				SearchTask left = new SearchTask(moves, lo, mid, board, depth, cutoff, evaluator, alpha, beta);
