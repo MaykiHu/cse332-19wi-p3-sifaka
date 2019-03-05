@@ -63,9 +63,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 				return curr.compute();
 			} 
 			if (lo < (int) (PERCENTAGE_SEQUENTIAL * moves.size())) {
-				BestMove<M> sequential = compute();
-				lo++;
-				return sequential;
+				return compute();
 			}
 			if (depth <= cutoff) {
 				return AlphaBetaSearcher.alphabeta(evaluator, board, depth, alpha, beta);
@@ -91,6 +89,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 				}
 				return new BestMove(bestMove, alpha);
 			} else {
+				lo += (int) (PERCENTAGE_SEQUENTIAL * moves.size());
 				int mid = lo + (hi - lo) / 2;
 				SearchTask left = new SearchTask(moves, lo, mid, board, depth, cutoff, evaluator, alpha, beta);
 				SearchTask right = new SearchTask(moves, mid, hi, board, depth, cutoff, evaluator, alpha, beta);
