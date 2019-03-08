@@ -58,8 +58,8 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
         return new BestMove(bestMove, alpha);
     }
 	
-	// if (move != null) copy board
-	// if (depth <= cuttof) run alphabeta
+	// if (move != null) copy board -- check
+	// if (depth <= cuttof) run alphabeta -- check
 	// if (new move list) run the first %_SEQ * list.size() moves sequentially, create task and then .compute()
 	// if (movelist size <= Divide_cuttof) for sequentially
 	// else divide and conquer
@@ -115,16 +115,15 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 	        		return new BestMove(-evaluator.stalemate());
 	        	}
 	        } else if (lo < (int) (PERCENTAGE_SEQUENTIAL * moves.size())) {
-				BestMove<M> move = sequential(moves, evaluator, board, depth, alpha, beta);
+				BestMove<M> seqMove = sequential(moves, evaluator, board, depth, alpha, beta);
 				lo += (int) (PERCENTAGE_SEQUENTIAL * moves.size());
-				if (-move.value > alpha) {
-					alpha = -move.value;
-					bestMove = move.move;
+				SearchTask parTask = new SearchTask(moves, lo, moves.size(), board, depth, cutoff, evaluator, alpha, beta);
+				BestMove<M> parMove = parTask.compute();
+				if (seqMove.value > parMove.value) {
+					return seqMove;
+				} else {
+					return parMove;
 				}
-				if (alpha >= beta) {
-					return new BestMove(bestMove, alpha);
-				}
-				return new BestMove(bestMove, alpha);
 			} else if (hi - lo <= DIVIDE_CUTOFF) {
 				SearchTask[] tasks = new SearchTask[hi - lo];
 				BestMove<M>[] results = (BestMove<M>[]) new BestMove[hi - lo];
