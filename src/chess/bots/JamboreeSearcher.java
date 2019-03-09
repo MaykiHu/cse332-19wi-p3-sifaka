@@ -14,49 +14,16 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 
     public M getBestMove(B board, int myTime, int opTime) {
     	/* Calculate the best move */
-        M move = alphabeta(this.evaluator, board, ply, super.cutoff, -evaluator.infty(), evaluator.infty()).move;
+        M move = jamboree(this.evaluator, board, ply, super.cutoff, -evaluator.infty(), evaluator.infty()).move;
         System.err.println(board.generateMoves().contains(move));
         return move;
     }
     
-	static <M extends Move<M>, B extends Board<M, B>> BestMove<M> alphabeta(Evaluator<B> evaluator,
+	static <M extends Move<M>, B extends Board<M, B>> BestMove<M> jamboree(Evaluator<B> evaluator,
 			B board, int depth, int cutoff, int alpha, int beta) {
         List<M> moves = board.generateMoves();
         BestMove<M> parallelMove = searchBestMove(moves, board, depth, cutoff, evaluator, -evaluator.infty(), evaluator.infty());
         return parallelMove;
-    }
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	static <M extends Move<M>, B extends Board<M, B>> BestMove<M> sequential(List<M> moves, Evaluator<B> evaluator, B board, int depth, 
-			int alpha, int beta) {
-    	if (board == null) {
-    		throw new IllegalArgumentException();
-    	}
-        if (depth == 0) {
-        	return new BestMove(evaluator.eval(board));
-        } 
-        if (moves.isEmpty()) {
-        	if (board.inCheck()) {
-        		return new BestMove(-evaluator.mate() - depth);
-        	} else {
-        		return new BestMove(-evaluator.stalemate());
-        	}
-        }
-        M bestMove = null;
-        for (int i = 0; i < (int)(PERCENTAGE_SEQUENTIAL * moves.size()); i++) {
-        	board.applyMove(moves.get(i));
-        	int value = -sequential(moves, evaluator, board, depth - 1, -beta, -alpha).value;
-        	board.undoMove();
-        	if (value > alpha) {
-        		alpha = value;
-        		bestMove = moves.get(i);
-        	}
-        	
-        	if (alpha >= beta) {
-        		return new BestMove(bestMove, alpha);
-        	}
-        }
-        return new BestMove(bestMove, alpha);
     }
 	
 	// if (move != null) copy board -- check
@@ -119,7 +86,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 					}
 					if (alpha >= beta) {
 						bestMove = moves.get(i);
-						//break; // May change this to a while loop to exit
+						break; // May change this to a while loop to exit
 					}
 				}
 				lo += (int) (PERCENTAGE_SEQUENTIAL * moves.size());
@@ -147,7 +114,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 		        		bestMove = moves.get(i + lo);
 		        	}
 		        	if (alpha >= beta) {
-		        		bestMove = moves.get(i + lo);
+		        		return new BestMove(bestMove, alpha);
 		        	}
 				}
 				return new BestMove(bestMove, alpha);
