@@ -1,6 +1,5 @@
 package chess.bots;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
@@ -110,9 +109,10 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 				return AlphaBetaSearcher.alphabeta(evaluator, board, depth, alpha, beta);
 			} else if (lo < (int) (PERCENTAGE_SEQUENTIAL * moves.size())) {
 				BestMove<M> seqMove = sequential(moves, evaluator, board, depth, alpha, beta);
-				lo += (int) (PERCENTAGE_SEQUENTIAL * moves.size());
-				SearchTask parTask = new SearchTask(moves, lo, moves.size(), board, depth, cutoff, evaluator, alpha, beta);
+				int newLo = lo + (int) (PERCENTAGE_SEQUENTIAL * moves.size());
+				SearchTask parTask = new SearchTask(moves, newLo, moves.size(), board, depth, cutoff, evaluator, alpha, beta);
 				BestMove<M> parMove = parTask.compute();
+				lo = newLo;
 				if (seqMove.value > parMove.value) {
 					return seqMove;
 				} else {
