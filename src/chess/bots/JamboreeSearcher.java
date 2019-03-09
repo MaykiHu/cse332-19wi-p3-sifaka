@@ -14,7 +14,9 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 
     public M getBestMove(B board, int myTime, int opTime) {
     	/* Calculate the best move */
-        return alphabeta(this.evaluator, board, ply, super.cutoff, -evaluator.infty(), evaluator.infty()).move;
+        M move = alphabeta(this.evaluator, board, ply, super.cutoff, -evaluator.infty(), evaluator.infty()).move;
+        System.err.println(board.generateMoves().contains(move));
+        return move;
     }
     
 	static <M extends Move<M>, B extends Board<M, B>> BestMove<M> alphabeta(Evaluator<B> evaluator,
@@ -107,8 +109,8 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 			} 
 			if (depth <= cutoff) {
 				return AlphaBetaSearcher.alphabeta(evaluator, board, depth, alpha, beta);
-			} else if (lo < (int) (PERCENTAGE_SEQUENTIAL * moves.size())) {
-				BestMove<M>[] results = (BestMove<M>[]) new BestMove[(int) (PERCENTAGE_SEQUENTIAL * moves.size()) - lo];
+			} else if (lo == 0 && lo < (int) (PERCENTAGE_SEQUENTIAL * moves.size())) {
+				BestMove<M>[] results = (BestMove<M>[]) new BestMove[(int) (PERCENTAGE_SEQUENTIAL * moves.size())];
 				for (int i = 0; i < results.length; i++) {
 					results[i] = new SearchTask(moves.get(i), board, depth, cutoff, evaluator, alpha, beta).compute();
 					if (-results[i].value > alpha) {
@@ -117,7 +119,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 					}
 					if (alpha >= beta) {
 						bestMove = moves.get(i);
-						break; // May change this to a while loop to exit
+						//break; // May change this to a while loop to exit
 					}
 				}
 				lo += (int) (PERCENTAGE_SEQUENTIAL * moves.size());
@@ -130,25 +132,23 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 				}
 			} else if (hi - lo <= DIVIDE_CUTOFF) {
 				SearchTask[] tasks = new SearchTask[hi - lo - 1];
-				BestMove<M>[] results = (BestMove<M>[]) new BestMove[hi - lo - 1];
+				BestMove<M>[] results = (BestMove<M>[]) new BestMove[hi - lo];
 				for (int i = 0; i < tasks.length; i++) {
 					tasks[i] = new SearchTask(moves.get(i + lo), board, depth, cutoff, evaluator, alpha, beta);
 					tasks[i].fork();
 				}
-				BestMove<M> computedMove = new SearchTask(moves.get(hi - lo - 1), board, depth, cutoff, evaluator, alpha, beta).compute();
-				for (int i = 0; i < tasks.length; i++) {
-					results[i] = (BestMove<M>) tasks[i].join();
+				results[hi - lo - 1] = new SearchTask(moves.get(hi - lo - 1), board, depth, cutoff, evaluator, alpha, beta).compute();
+				for (int i = 0; i < results.length; i++) {
+					if (i != hi - lo - 1) {
+						results[i] = (BestMove<M>) tasks[i].join();
+					}
 					if (-results[i].value > alpha) {
 		        		alpha = -results[i].value;
 		        		bestMove = moves.get(i + lo);
 		        	}
 		        	if (alpha >= beta) {
-		        		return new BestMove(bestMove, alpha);
+		        		bestMove = moves.get(i + lo);
 		        	}
-				}
-				if (computedMove.value > alpha) {
-					alpha = computedMove.value;
-					bestMove = moves.get(hi - lo - 1);
 				}
 				return new BestMove(bestMove, alpha);
 			} else {
