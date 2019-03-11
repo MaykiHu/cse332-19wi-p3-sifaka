@@ -52,6 +52,13 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends 
 				B newBoard = board.copy();
 				newBoard.applyMove(move);
 				List<M> newMoves = newBoard.generateMoves();
+				if(newMoves.isEmpty()) { 
+		    		if(newBoard.inCheck()) {
+		    			return new BestMove<M>(null, -evaluator.mate() - depth);
+		    		} else {
+		    			return new BestMove<M>(null, -evaluator.stalemate());
+		    		}
+		    	}
 				SearchTask curr = new SearchTask(newMoves, 0, newMoves.size(), newBoard, depth - 1, cutoff, evaluator);
 				return curr.compute();
 			} 
