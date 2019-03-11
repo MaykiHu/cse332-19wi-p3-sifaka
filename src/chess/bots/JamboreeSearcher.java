@@ -9,135 +9,118 @@ import cse332.chess.interfaces.Board;
 import cse332.chess.interfaces.Evaluator;
 import cse332.chess.interfaces.Move;
 
-public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
-        AbstractSearcher<M, B> {
+public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends AbstractSearcher<M, B> {
+	private static final int DIVIDE_CUTOFF = 2;
+	private static final double PERCENTAGE_SEQUENTIAL = 0.5;
+	private static ForkJoinPool POOL = new ForkJoinPool();
+	
+	public M getBestMove(B board, int myTime, int opTime) {
+		SearchTask<M, B> bestMoveTask = new SearchTask<M, B>(null, -1, -1, board, ply, cutoff, evaluator, -evaluator.infty(), evaluator.infty());
+		BestMove<M> bestMove = POOL.invoke(bestMoveTask);
+		return bestMove.move;
+	}
 
-    public M getBestMove(B board, int myTime, int opTime) {
-    	/* Calculate the best move */
-        M move = jamboree(this.evaluator, board, ply, super.cutoff, -evaluator.infty(), evaluator.infty()).move;
-        System.err.println(board.generateMoves().contains(move));
-        return move;
-    }
-    
-	static <M extends Move<M>, B extends Board<M, B>> BestMove<M> jamboree(Evaluator<B> evaluator,
-			B board, int depth, int cutoff, int alpha, int beta) {
-        List<M> moves = board.generateMoves();
-        BestMove<M> parallelMove = searchBestMove(moves, board, depth, cutoff, evaluator, -evaluator.infty(), evaluator.infty());
-        return parallelMove;
-    }
-	
-	// if (move != null) copy board -- check
-	// if (depth <= cuttof) run alphabeta -- check
-	// if (new move list) run the first %_SEQ * list.size() moves sequentially, create task and then .compute()
-	// if (movelist size <= Divide_cuttof) for sequentially
-	// else divide and conquer
-	
-	// make sure to return a move from your current board, also if tie, return left one first
-	// make sure to compare %_seq move with divide & conquer move
-	
-    private static final int DIVIDE_CUTOFF = 2;
-    private static final double PERCENTAGE_SEQUENTIAL = 0.5;
-    private static final ForkJoinPool POOL = new ForkJoinPool();
 	@SuppressWarnings("serial")
 	private static class SearchTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
-    	int lo; int hi; List<M> moves; B board; Evaluator<B> evaluator; int cutoff; int depth; M move; int alpha; int beta;
-    	
-    	SearchTask(List<M> moves, int lo, int hi, B board, int depth, int cutoff, Evaluator<B> evaluator, int alpha, int beta) {
-    		this.moves = moves;
-    		this.lo = lo;
-    		this.hi = hi;
-    		this.board = board;    	
-    		this.depth = depth;
-    		this.evaluator = evaluator;
-    		this.cutoff = cutoff;
-    		this.alpha = alpha;
-    		this.beta = beta;
-    	}
-    	
-		SearchTask(M move, B board, int depth, int cutoff, Evaluator<B> evaluator, int alpha, int beta) {
-    		this.move = move;
-    		this.board = board;
-    		this.depth = depth;
-    		this.cutoff = cutoff;
-    		this.evaluator = evaluator;
-    		this.alpha = alpha;
-    		this.beta = beta;
-    	}
-    	
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		protected BestMove<M> compute() {
-			M bestMove = null;
-			if (move != null) { // Have child apply moves
-				B newBoard = board.copy();
-				newBoard.applyMove(move);
-				List<M> newMoves = newBoard.generateMoves();
-				SearchTask curr = new SearchTask(newMoves, 0, newMoves.size(), newBoard, depth - 1, cutoff, evaluator, alpha, beta);
-				return curr.compute();
-			} 
-			if (depth <= cutoff) {
-				return AlphaBetaSearcher.alphabeta(evaluator, board, depth, alpha, beta);
-			} else if (lo == 0 && lo < (int) (PERCENTAGE_SEQUENTIAL * moves.size())) {
-				BestMove<M>[] results = (BestMove<M>[]) new BestMove[(int) (PERCENTAGE_SEQUENTIAL * moves.size())];
-				for (int i = 0; i < results.length; i++) {
-					results[i] = new SearchTask(moves.get(i), board, depth, cutoff, evaluator, alpha, beta).compute();
-					if (-results[i].value > alpha) {
-						alpha = -results[i].value;
-						bestMove = moves.get(i);
+		int lo; int hi; List<M> moves; B board; Evaluator<B> evaluator; int cutoff; int depth; M move; int alpha; int beta;
+
+		public SearchTask(List<M> moves, int lo, int hi, B board, int depth, int cutoff, Evaluator<B> evaluator,
+				int alpha, int beta) {
+			this.moves = moves;
+			this.lo = lo;
+			this.hi = hi;
+			this.board = board;
+			this.depth = depth;
+			this.cutoff = cutoff;
+			this.evaluator = evaluator;
+			this.alpha = alpha;
+			this.beta = beta;
+		}
+
+		public SearchTask(M move, B board, int depth, int cutoff, Evaluator<B> evaluator, int alpha, int beta) {
+			this.move = move;
+			this.board = board;
+			this.depth = depth;
+			this.cutoff = cutoff;
+			this.evaluator = evaluator;
+			this.alpha = alpha;
+			this.beta = beta;
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public BestMove<M> compute() {
+			BestMove<M> best = new BestMove<M>(null, alpha);
+			if (moves == null) { // If we need to populate board -- this is when we sequential the % few
+				if (move != null) { // If we have to apply a move
+					board = board.copy();
+					board.applyMove(move);
+				}
+				if (depth <= cutoff) {
+					return AlphaBetaSearcher.alphabeta(evaluator, board, depth, alpha, beta);
+				}
+				moves = board.generateMoves();
+				if(moves.isEmpty()) { 
+		    		if(board.inCheck()) {
+		    			return new BestMove<M>(null, -evaluator.mate() - depth);
+		    		} else {
+		    			return new BestMove<M>(null, -evaluator.stalemate());
+		    		}
+		    	}
+				int seqCutoff = (int) (PERCENTAGE_SEQUENTIAL * moves.size());
+				for (int i = 0; i < seqCutoff; i++) {
+					int value = -(new SearchTask<M, B>(moves.get(i), board, depth - 1, cutoff, evaluator, -beta, -alpha).compute().value);
+					if (value > alpha) {
+						alpha = value;
+						best.value = alpha;
+						best.move = moves.get(i);
 					}
 					if (alpha >= beta) {
-						bestMove = moves.get(i);
-						break; // May change this to a while loop to exit
+						return best;
 					}
 				}
-				lo += (int) (PERCENTAGE_SEQUENTIAL * moves.size());
-				SearchTask parTask = new SearchTask(moves, lo, moves.size(), board, depth, cutoff, evaluator, alpha, beta);
-				BestMove<M> parMove = parTask.compute();
-				if (parMove.value > alpha) {
-					return parMove;
-				} else {
-					return new BestMove(bestMove, alpha);
-				}
-			} else if (hi - lo <= DIVIDE_CUTOFF) {
-				SearchTask[] tasks = new SearchTask[hi - lo - 1];
-				BestMove<M>[] results = (BestMove<M>[]) new BestMove[hi - lo];
+				lo = seqCutoff;
+				hi = moves.size() - 1; // hi is the max index that should be used
+			} 
+			if (hi - lo <= DIVIDE_CUTOFF) { // Stop divide conquer
+				SearchTask<M, B>[] tasks = new SearchTask[hi - lo]; // Tasks that need to be forked
 				for (int i = 0; i < tasks.length; i++) {
-					tasks[i] = new SearchTask(moves.get(i + lo), board, depth, cutoff, evaluator, alpha, beta);
+					tasks[i] = new SearchTask<M, B>(moves.get(i + lo), board, depth - 1, cutoff, evaluator, -beta, -alpha);
 					tasks[i].fork();
 				}
-				results[hi - lo - 1] = new SearchTask(moves.get(hi - lo - 1), board, depth, cutoff, evaluator, alpha, beta).compute();
+				BestMove<M>[] results = new BestMove[tasks.length + 1]; // All the results from compute, the one below is the solo compute
+				results[tasks.length] = new SearchTask<M, B>(moves.get(hi), board, depth - 1, cutoff, evaluator, -beta, -alpha).compute().negate();
 				for (int i = 0; i < results.length; i++) {
-					if (i != hi - lo - 1) {
-						results[i] = (BestMove<M>) tasks[i].join();
+					if (i != results.length - 1) {
+						results[i] = tasks[i].join().negate();
 					}
-					if (-results[i].value > alpha) {
-		        		alpha = -results[i].value;
-		        		bestMove = moves.get(i + lo);
-		        	}
-		        	if (alpha >= beta) {
-		        		return new BestMove(bestMove, alpha);
-		        	}
+					if (results[i].value > best.value) {
+						best.value = results[i].value;
+						best.move = moves.get(i + lo);
+					}
 				}
-				return new BestMove(bestMove, alpha);
-			} else {
+				return best;
+			} else { // Keep divide conquer
 				int mid = lo + (hi - lo) / 2;
-				SearchTask left = new SearchTask(moves, lo, mid, board, depth, cutoff, evaluator, alpha, beta);
-				SearchTask right = new SearchTask(moves, mid, hi, board, depth, cutoff, evaluator, alpha, beta);
+				SearchTask<M, B> left = new SearchTask<>(moves, lo, mid, board, depth, cutoff, evaluator, alpha, beta);
+				SearchTask<M, B> right = new SearchTask<>(moves, mid + 1, hi, board, depth, cutoff, evaluator, alpha, beta);
 				left.fork();
 				BestMove<M> rightBest = right.compute();
-				BestMove<M> leftBest = (BestMove<M>) left.join();
+				BestMove<M> leftBest = left.join();
 				if (rightBest.value > leftBest.value) {
-					return rightBest;
+					if (rightBest.value > best.value) {
+						return rightBest;
+					} else {
+						return best;
+					}
 				} else {
-					return leftBest;
+					if (leftBest.value > best.value) {
+						return leftBest;
+					} else {
+						return best;
+					}
 				}
 			}
 		}
-    }
-    
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-	public static <M extends Move<M>, B extends Board<M, B>> BestMove<M> searchBestMove(
-			 List<M> moves, B board, int depth, int cutoff, Evaluator<B> evaluator, int alpha, int beta) {
-    	SearchTask task = new SearchTask(moves, 0, moves.size(), board, depth, cutoff, evaluator, alpha, beta);
-    	return (BestMove<M>) POOL.invoke(task);
-    }
+	}
 }
