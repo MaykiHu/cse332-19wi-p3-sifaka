@@ -10,8 +10,10 @@ import cse332.chess.interfaces.Evaluator;
 import cse332.chess.interfaces.Move;
 
 
-public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
-        AbstractSearcher<M, B> {
+public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends AbstractSearcher<M, B> {
+	private static final int DIVIDE_CUTOFF = 2;
+    private static final ForkJoinPool POOL = new ForkJoinPool();
+    
     public M getBestMove(B board, int myTime, int opTime) {
     	/* Calculate the best move */
         return minimax(this.evaluator, board, ply, super.cutoff).move;
@@ -22,8 +24,6 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
         return searchBestMove(moves, board, depth, cutoff, evaluator);
     }
     
-    private static final int DIVIDE_CUTOFF = 2;
-    private static final ForkJoinPool POOL = new ForkJoinPool();
 	@SuppressWarnings("serial")
 	private static class SearchTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
     	int lo; int hi; List<M> moves; B board; Evaluator<B> evaluator; int cutoff; int depth; M move;

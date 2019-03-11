@@ -16,8 +16,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends 
 	
 	public M getBestMove(B board, int myTime, int opTime) {
 		SearchTask<M, B> bestMoveTask = new SearchTask<M, B>(null, -1, -1, board, ply, cutoff, evaluator, -evaluator.infty(), evaluator.infty());
-		BestMove<M> bestMove = POOL.invoke(bestMoveTask);
-		return bestMove.move;
+		return POOL.invoke(bestMoveTask).move;
 	}
 
 	@SuppressWarnings("serial")
