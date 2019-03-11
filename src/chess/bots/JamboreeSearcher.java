@@ -80,16 +80,16 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends 
 					}
 				}
 				lo = seqCutoff;
-				hi = moves.size() - 1; // hi is the max index that should be used
+				hi = moves.size();
 			} 
 			if (hi - lo <= DIVIDE_CUTOFF) { // Stop divide conquer
-				SearchTask<M, B>[] tasks = new SearchTask[hi - lo]; // Tasks that need to be forked
+				SearchTask<M, B>[] tasks = new SearchTask[hi - lo - 1]; // Tasks that need to be forked
 				for (int i = 0; i < tasks.length; i++) {
 					tasks[i] = new SearchTask<M, B>(moves.get(i + lo), board, depth - 1, cutoff, evaluator, -beta, -alpha);
 					tasks[i].fork();
 				}
 				BestMove<M>[] results = new BestMove[tasks.length + 1]; // All the results from compute, the one below is the solo compute
-				results[tasks.length] = new SearchTask<M, B>(moves.get(hi), board, depth - 1, cutoff, evaluator, -beta, -alpha).compute().negate();
+				results[tasks.length] = new SearchTask<M, B>(moves.get(hi - 1), board, depth - 1, cutoff, evaluator, -beta, -alpha).compute().negate();
 				for (int i = 0; i < results.length; i++) {
 					if (i != results.length - 1) {
 						results[i] = tasks[i].join().negate();
@@ -103,7 +103,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends 
 			} else { // Keep divide conquer
 				int mid = lo + (hi - lo) / 2;
 				SearchTask<M, B> left = new SearchTask<>(moves, lo, mid, board, depth, cutoff, evaluator, alpha, beta);
-				SearchTask<M, B> right = new SearchTask<>(moves, mid + 1, hi, board, depth, cutoff, evaluator, alpha, beta);
+				SearchTask<M, B> right = new SearchTask<>(moves, mid, hi, board, depth, cutoff, evaluator, alpha, beta);
 				left.fork();
 				BestMove<M> rightBest = right.compute();
 				BestMove<M> leftBest = left.join();
