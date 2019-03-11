@@ -50,8 +50,8 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends 
 		@Override
 		@SuppressWarnings("unchecked")
 		public BestMove<M> compute() {
-			BestMove<M> bestMove = new BestMove<M>(null, alpha);
-			if (moves == null) { // If we need to populate board -- this is when we sequential the % few before rest in parallel
+			BestMove<M> best = new BestMove<M>(null, alpha);
+			if (moves == null) { // If we need to populate board -- this is when we sequential the % few
 				if (move != null) { // If we have to apply a move
 					board = board.copy();
 					board.applyMove(move);
@@ -72,14 +72,14 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends 
 					int value = -(new SearchTask<M, B>(moves.get(i), board, depth - 1, cutoff, evaluator, -beta, -alpha).compute().value);
 					if (value > alpha) {
 						alpha = value;
-						bestMove.value = alpha;
-						bestMove.move = moves.get(i);
+						best.value = alpha;
+						best.move = moves.get(i);
 					}
 					if (alpha >= beta) {
-						return bestMove;
+						return best;
 					}
 				}
-				lo += seqCutoff;
+				lo = seqCutoff;
 				hi = moves.size();
 			} 
 			if (hi - lo <= DIVIDE_CUTOFF) { // Stop divide conquer
@@ -91,15 +91,15 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends 
 				BestMove<M>[] results = new BestMove[tasks.length + 1]; // All the results from compute, the one below is the solo compute
 				results[tasks.length] = new SearchTask<M, B>(moves.get(hi - 1), board, depth - 1, cutoff, evaluator, -beta, -alpha).compute().negate();
 				for (int i = 0; i < results.length; i++) {
-					if (i != results.length - 1) { // For all the forked tasks, join them
+					if (i != results.length - 1) {
 						results[i] = tasks[i].join().negate();
 					}
-					if (results[i].value > bestMove.value) {
-						bestMove.value = results[i].value;
-						bestMove.move = moves.get(i + lo);
+					if (results[i].value > best.value) {
+						best.value = results[i].value;
+						best.move = moves.get(i + lo);
 					}
 				}
-				return bestMove;
+				return best;
 			} else { // Keep divide conquer
 				int mid = lo + (hi - lo) / 2;
 				SearchTask<M, B> left = new SearchTask<>(moves, lo, mid, board, depth, cutoff, evaluator, alpha, beta);
@@ -108,16 +108,16 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends 
 				BestMove<M> rightBest = right.compute();
 				BestMove<M> leftBest = left.join();
 				if (rightBest.value > leftBest.value) {
-					if (rightBest.value > alpha) {
+					if (rightBest.value > best.value) {
 						return rightBest;
 					} else {
-						return bestMove;
+						return best;
 					}
 				} else {
-					if (leftBest.value > alpha) {
+					if (leftBest.value > best.value) {
 						return leftBest;
 					} else {
-						return bestMove;
+						return best;
 					}
 				}
 			}
