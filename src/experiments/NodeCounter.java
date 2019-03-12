@@ -33,13 +33,15 @@ public class NodeCounter {
         
         for (int ply = 1; ply <= 5; ply++) { // Test each ply
         	Scanner inputs = new Scanner(new File("/Users/M8yki/git/p3-sifaka/src/experiments/TestingInputs.txt"));
+        	int numInputs = 0;
         	while (inputs.hasNextLine()) {
+        		numInputs++;
         		String input = inputs.nextLine().substring(5); // Where the position/input should be tested
         		printMove(input, searcher, ply, ply / 2); // Cutoff is ply / 2
         	}
-        	System.out.println("Average nodes visited: " + (int)((double) searcher.NODE_COUNT / 64)); // Simple + AlphaBeta
-        	//System.out.println("Average nodes visited: " + (int)(ParallelSearcher.NODE_COUNT.doubleValue() / 64));
-        	//System.out.println("Average nodes visited: " + (int)(JamboreeSearcher.NODE_COUNT.doubleValue() / 64));
+        	System.out.println("Average nodes visited: " + (int)((double) searcher.NODE_COUNT / numInputs)); // Simple + AlphaBeta
+        	//System.out.println("Average nodes visited: " + (int)(ParallelSearcher.NODE_COUNT.doubleValue() / numInputs));
+        	//System.out.println("Average nodes visited: " + (int)(JamboreeSearcher.NODE_COUNT.doubleValue() / numInputs));
         }
     }
 }
