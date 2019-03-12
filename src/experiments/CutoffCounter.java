@@ -38,7 +38,7 @@ public class CutoffCounter {
         	printMove(input, searcher, ply, ply / 2); // Cutoff is ply / 2
         	long endTime = System.nanoTime();
         	long elapsedTime = endTime - startTime;
-        	System.out.println("Board " + numBoard + " took " + elapsedTime + " nanoseconds.");
+        	System.out.println("Board " + numBoard + " took " + elapsedTime / 1000000 + " milliseconds.");
         }
     }
 }

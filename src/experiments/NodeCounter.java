@@ -29,7 +29,7 @@ public class NodeCounter {
         AlphaBetaSearcher<ArrayMove, ArrayBoard> searcher = new AlphaBetaSearcher<>();
         //JamboreeSearcher<ArrayMove, ArrayBoard> searcher = new JamboreeSearcher<>();
         
-        for (int ply = 1; ply <= 2; ply++) { // Test each ply
+        for (int ply = 1; ply <= 5; ply++) { // Test each ply
         	Scanner inputs = new Scanner(new File("src/TestingInputs.txt"));
         	int numInputs = 0;
         	while (inputs.hasNextLine()) {
