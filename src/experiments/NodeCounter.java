@@ -30,7 +30,7 @@ public class NodeCounter {
         //JamboreeSearcher<ArrayMove, ArrayBoard> searcher = new JamboreeSearcher<>();
         
         for (int ply = 1; ply <= 5; ply++) { // Test each ply
-        	Scanner inputs = new Scanner(new File("/p3-sifaka/cse332-p3/TestingInputs.txt"));
+        	Scanner inputs = new Scanner(new File("/cse332-p3/TestingInputs.txt"));
         	int numInputs = 0;
         	while (inputs.hasNextLine()) {
         		numInputs++;
