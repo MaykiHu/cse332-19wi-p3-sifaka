@@ -11,7 +11,7 @@ import cse332.chess.interfaces.Move;
 
 public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends AbstractSearcher<M, B> {
 	private static final int DIVIDE_CUTOFF = 2;
-	private static final double PERCENTAGE_SEQUENTIAL = 0.5;
+	private static final double PERCENTAGE_SEQUENTIAL = 0.25;
 	private static final ForkJoinPool POOL = new ForkJoinPool();
 	
 	public M getBestMove(B board, int myTime, int opTime) {
