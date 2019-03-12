@@ -6,9 +6,7 @@ import java.util.Scanner;
 
 import chess.board.ArrayBoard;
 import chess.board.ArrayMove;
-import chess.bots.LazySearcher;
 import chess.game.SimpleEvaluator;
-import cse332.chess.interfaces.Move;
 import cse332.chess.interfaces.Searcher;
 
 public class NodeCounter {
@@ -32,7 +30,7 @@ public class NodeCounter {
         //JamboreeSearcher<ArrayMove, ArrayBoard> searcher = new JamboreeSearcher<>();
         
         for (int ply = 1; ply <= 5; ply++) { // Test each ply
-        	Scanner inputs = new Scanner(new File("/Users/M8yki/git/p3-sifaka/src/experiments/TestingInputs.txt"));
+        	Scanner inputs = new Scanner(new File("cse332-p3/src/experiments/TestingInputs.txt"));
         	int numInputs = 0;
         	while (inputs.hasNextLine()) {
         		numInputs++;
