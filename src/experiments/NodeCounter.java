@@ -22,7 +22,7 @@ public class NodeCounter {
     public static void printMove(String fen, Searcher<ArrayMove, ArrayBoard> searcher, int depth, int cutoff) {
         getBestMove(fen, searcher, depth, cutoff);
     }
-    @SuppressWarnings("resource")
+    @SuppressWarnings({ "resource", "static-access" })
 	public static void main(String[] args) throws FileNotFoundException {
         //SimpleSearcher<ArrayMove, ArrayBoard> searcher = new SimpleSearcher<>();
         //ParallelSearcher<ArrayMove, ArrayBoard> searcher = new ParallelSearcher<>();
