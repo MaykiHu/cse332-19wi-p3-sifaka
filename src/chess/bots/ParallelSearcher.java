@@ -52,8 +52,8 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends 
 				B newBoard = board.copy();
 				newBoard.applyMove(move);
 				List<M> newMoves = newBoard.generateMoves();
-				if(newMoves.isEmpty()) { 
-		    		if(newBoard.inCheck()) {
+				if (newMoves.isEmpty()) { 
+		    		if (newBoard.inCheck()) {
 		    			return new BestMove<M>(null, -evaluator.mate() - depth);
 		    		} else {
 		    			return new BestMove<M>(null, -evaluator.stalemate());

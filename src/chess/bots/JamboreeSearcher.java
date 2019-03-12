@@ -59,8 +59,8 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends 
 					return AlphaBetaSearcher.alphabeta(evaluator, board, depth, alpha, beta);
 				}
 				moves = board.generateMoves();
-				if(moves.isEmpty()) { 
-		    		if(board.inCheck()) {
+				if (moves.isEmpty()) { 
+		    		if (board.inCheck()) {
 		    			return new BestMove<M>(null, -evaluator.mate() - depth);
 		    		} else {
 		    			return new BestMove<M>(null, -evaluator.stalemate());
