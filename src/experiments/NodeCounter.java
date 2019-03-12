@@ -19,8 +19,8 @@ public class NodeCounter extends SearcherTests {
 
 	public static void main(String[] args) { new NodeCounter().run(); }
     public static void init() { 
-    	STUDENT = new SimpleSearcher<ArrayMove, ArrayBoard>();
-    	//STUDENT = new ParallelSearcher<ArrayMove, ArrayBoard>();
+    	//STUDENT = new SimpleSearcher<ArrayMove, ArrayBoard>();
+    	STUDENT = new ParallelSearcher<ArrayMove, ArrayBoard>();
     	//STUDENT = new AlphaBetaSearcher<ArrayMove, ArrayBoard>();
     	//STUDENT = new JamboreeSearcher<ArrayMove, ArrayBoard>();
     }
@@ -32,8 +32,8 @@ public class NodeCounter extends SearcherTests {
 	    //test("depth1", TestingInputs1.FENS_TO_TEST.length); // Figure out how to change this in our SearcherTests in experiments
         //test("depth2", TestingInputs1.FENS_TO_TEST.length);
         //test("depth3", TestingInputs1.FENS_TO_TEST.length);
-        //test("depth4", TestingInputs1.FENS_TO_TEST.length);
-        test("depth5Test1", TestingInputs1.FENS_TO_TEST.length);
+        test("depth4", TestingInputs1.FENS_TO_TEST.length);
+        //test("depth5Test1", TestingInputs1.FENS_TO_TEST.length);
         
 		finish();
 	} 
