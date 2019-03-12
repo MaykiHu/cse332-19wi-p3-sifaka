@@ -8,8 +8,12 @@ import cse332.chess.interfaces.Evaluator;
 import cse332.chess.interfaces.Move;
 
 public class AlphaBetaSearcher<M extends Move<M>, B extends Board<M, B>> extends AbstractSearcher<M, B> {
+	private static int NODE_COUNT = 0;
+	
     public M getBestMove(B board, int myTime, int opTime) {
-    	return alphabeta(this.evaluator, board, ply, -evaluator.infty(), evaluator.infty()).move;
+    	M bestMove = alphabeta(this.evaluator, board, ply, -evaluator.infty(), evaluator.infty()).move;
+    	System.err.println("Nodes: " + NODE_COUNT);
+        return bestMove;
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -31,6 +35,8 @@ public class AlphaBetaSearcher<M extends Move<M>, B extends Board<M, B>> extends
         M bestMove = null;
         for (M move : moves) {
         	board.applyMove(move);
+        	NODE_COUNT++;
+        	JamboreeSearcher.NODE_COUNT.add(1);
         	int value = -alphabeta(evaluator, board, depth - 1, -beta, -alpha).value;
         	board.undoMove();
         	if (value > alpha) {

@@ -43,6 +43,7 @@ public class SimpleSearcher<M extends Move<M>, B extends Board<M, B>> extends
         for (M move : moves) {
         	board.applyMove(move);
         	NODE_COUNT++;
+        	ParallelSearcher.NODE_COUNT.add(1);
         	int value = -minimax(evaluator, board, depth - 1).value;
         	board.undoMove();
         	if (value > bestValue) {

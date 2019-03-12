@@ -3,6 +3,7 @@ package experiments;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
+import java.util.concurrent.atomic.LongAdder;
 
 import cse332.chess.interfaces.AbstractSearcher;
 import cse332.chess.interfaces.Board;
@@ -13,10 +14,13 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends 
 	private static final int DIVIDE_CUTOFF = 2;
 	private static final double PERCENTAGE_SEQUENTIAL = 0.25;
 	private static final ForkJoinPool POOL = new ForkJoinPool();
+	public static LongAdder NODE_COUNT = new LongAdder();
 	
 	public M getBestMove(B board, int myTime, int opTime) {
 		SearchTask<M, B> bestMoveTask = new SearchTask<M, B>(null, -1, -1, board, ply, cutoff, evaluator, -evaluator.infty(), evaluator.infty());
-		return POOL.invoke(bestMoveTask).move;
+		M bestMove = POOL.invoke(bestMoveTask).move;
+		System.err.println("Nodes: " + NODE_COUNT.longValue());
+        return bestMove;
 	}
 
 	@SuppressWarnings("serial")
@@ -54,6 +58,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends 
 				if (move != null) { // If we have to apply a move
 					board = board.copy();
 					board.applyMove(move);
+					NODE_COUNT.add(1);
 				}
 				if (depth <= cutoff) {
 					return AlphaBetaSearcher.alphabeta(evaluator, board, depth, alpha, beta);

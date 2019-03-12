@@ -14,12 +14,12 @@ import cse332.chess.interfaces.Move;
 public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends AbstractSearcher<M, B> {
 	private static final int DIVIDE_CUTOFF = 2;
     private static final ForkJoinPool POOL = new ForkJoinPool();
-    private static LongAdder NODE_COUNT = new LongAdder();
+    public static LongAdder NODE_COUNT = new LongAdder();
     
     public M getBestMove(B board, int myTime, int opTime) {
     	/* Calculate the best move */
     	M bestMove = minimax(this.evaluator, board, ply, super.cutoff).move;
-        System.err.println("Nodes: " + NODE_COUNT.intValue());
+        System.err.println("Nodes: " + NODE_COUNT.longValue());
         return bestMove;
     }
     
@@ -55,6 +55,7 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends 
 			if (move != null) { // Have child apply moves
 				B newBoard = board.copy();
 				newBoard.applyMove(move);
+				NODE_COUNT.add(1);
 				List<M> newMoves = newBoard.generateMoves();
 				if (newMoves.isEmpty()) { 
 		    		if (newBoard.inCheck()) {
@@ -68,7 +69,6 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends 
 			} 
 
 			if (depth <= cutoff) {
-				NODE_COUNT.add(1);
 				return SimpleSearcher.minimax(evaluator, board, depth);
 			} else if (hi - lo <= DIVIDE_CUTOFF) {
 				SearchTask[] tasks = new SearchTask[hi - lo];
