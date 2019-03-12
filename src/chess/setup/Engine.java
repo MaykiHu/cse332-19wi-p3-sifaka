@@ -24,7 +24,7 @@ public class Engine {
 	    searcher = new JamboreeSearcher<ArrayMove,ArrayBoard>();
 	
 	public Engine(int time, int inc) {
-        searcher.setDepth(6); // Lucky 6 in Chinese culture
+        searcher.setDepth(5); // Lucky 6 in Chinese culture
         searcher.setCutoff(2);
 
         searcher.setEvaluator(new SimpleEvaluator());
