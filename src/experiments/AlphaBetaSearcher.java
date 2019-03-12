@@ -8,12 +8,10 @@ import cse332.chess.interfaces.Evaluator;
 import cse332.chess.interfaces.Move;
 
 public class AlphaBetaSearcher<M extends Move<M>, B extends Board<M, B>> extends AbstractSearcher<M, B> {
-	private static int NODE_COUNT = 0;
+	public static int NODE_COUNT = 0;
 	
     public M getBestMove(B board, int myTime, int opTime) {
-    	M bestMove = alphabeta(this.evaluator, board, ply, -evaluator.infty(), evaluator.infty()).move;
-    	System.err.println("Nodes: " + NODE_COUNT);
-        return bestMove;
+    	return alphabeta(this.evaluator, board, ply, -evaluator.infty(), evaluator.infty()).move;
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })

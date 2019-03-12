@@ -18,9 +18,7 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends 
     
     public M getBestMove(B board, int myTime, int opTime) {
     	/* Calculate the best move */
-    	M bestMove = minimax(this.evaluator, board, ply, super.cutoff).move;
-        System.err.println("Nodes: " + NODE_COUNT.longValue());
-        return bestMove;
+    	return minimax(this.evaluator, board, ply, super.cutoff).move;
     }
     
 	static <M extends Move<M>, B extends Board<M, B>> BestMove<M> minimax(Evaluator<B> evaluator, B board, int depth, int cutoff) {

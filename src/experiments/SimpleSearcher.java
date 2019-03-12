@@ -13,13 +13,11 @@ import cse332.chess.interfaces.Move;
  */
 public class SimpleSearcher<M extends Move<M>, B extends Board<M, B>> extends
         AbstractSearcher<M, B> {
-	private static int NODE_COUNT = 0;
+	public static int NODE_COUNT = 0;
 	
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
-        M bestMove = minimax(this.evaluator, board, ply).move;
-        System.err.println("Nodes: " + NODE_COUNT);
-        return bestMove;
+        return minimax(this.evaluator, board, ply).move;
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
