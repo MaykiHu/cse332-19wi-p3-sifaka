@@ -30,9 +30,9 @@ public class NodeCounter extends SearcherTests {
 
 	    ALLOWED_TIME = Integer.MAX_VALUE;
 	    //test("depth1", TestingInputs1.FENS_TO_TEST.length); // Figure out how to change this in our SearcherTests in experiments
-        test("depth2", TestingInputs1.FENS_TO_TEST.length);
+        //test("depth2", TestingInputs1.FENS_TO_TEST.length);
         //test("depth3", TestingInputs1.FENS_TO_TEST.length);
-        //test("depth4", TestingInputs1.FENS_TO_TEST.length);
+        test("depth4", TestingInputs1.FENS_TO_TEST.length);
         //test("depth5Test1", TestingInputs1.FENS_TO_TEST.length);
         
 		finish();
