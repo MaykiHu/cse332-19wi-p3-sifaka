@@ -1,0 +1,3 @@
+  0: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -
+ 31: r3k2r/pp5p/2n1p1p1/q1pp1p2/5B2/2PP1Q2/P1P2PPP/R4RK1 b kq -
+ 58: 2k3r1/p6p/2n5/3pp3/1pp5/2qPP3/P1P1K2P/R1R5 w - -

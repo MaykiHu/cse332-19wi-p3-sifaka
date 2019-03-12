@@ -24,12 +24,12 @@ public class NodeCounter {
     }
     @SuppressWarnings("resource")
 	public static void main(String[] args) throws FileNotFoundException {
-        SimpleSearcher<ArrayMove, ArrayBoard> searcher = new SimpleSearcher<>();
+        //SimpleSearcher<ArrayMove, ArrayBoard> searcher = new SimpleSearcher<>();
         //ParallelSearcher<ArrayMove, ArrayBoard> searcher = new ParallelSearcher<>();
-        //AlphaBetaSearcher<ArrayMove, ArrayBoard> searcher = new AlphaBetaSearcher<>();
+        AlphaBetaSearcher<ArrayMove, ArrayBoard> searcher = new AlphaBetaSearcher<>();
         //JamboreeSearcher<ArrayMove, ArrayBoard> searcher = new JamboreeSearcher<>();
         
-        for (int ply = 1; ply <= 5; ply++) { // Test each ply
+        for (int ply = 1; ply <= 2; ply++) { // Test each ply
         	Scanner inputs = new Scanner(new File("src/TestingInputs.txt"));
         	int numInputs = 0;
         	while (inputs.hasNextLine()) {
@@ -37,9 +37,8 @@ public class NodeCounter {
         		String input = inputs.nextLine().substring(5); // Where the position/input should be tested
         		printMove(input, searcher, ply, ply / 2); // Cutoff is ply / 2
         	}
-        	System.out.println("Average nodes visited: " + (int)((double) searcher.NODE_COUNT / numInputs)); // Simple + AlphaBeta
-        	//System.out.println("Average nodes visited: " + (int)(ParallelSearcher.NODE_COUNT.doubleValue() / numInputs));
-        	//System.out.println("Average nodes visited: " + (int)(JamboreeSearcher.NODE_COUNT.doubleValue() / numInputs));
+        	System.out.println("Average nodes visited: " + (int)((double) searcher.NODE_COUNT.get() / numInputs)); // Sequential
+        	//System.out.println("Average nodes visited: " + (int)(searcher.NODE_COUNT.doubleValue() / numInputs)); // Parallel
         }
     }
 }

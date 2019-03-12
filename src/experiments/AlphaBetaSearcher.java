@@ -1,6 +1,7 @@
 package experiments;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import cse332.chess.interfaces.AbstractSearcher;
 import cse332.chess.interfaces.Board;
@@ -8,7 +9,7 @@ import cse332.chess.interfaces.Evaluator;
 import cse332.chess.interfaces.Move;
 
 public class AlphaBetaSearcher<M extends Move<M>, B extends Board<M, B>> extends AbstractSearcher<M, B> {
-	public static int NODE_COUNT = 0;
+	public static AtomicInteger NODE_COUNT = new AtomicInteger();
 	
     public M getBestMove(B board, int myTime, int opTime) {
     	return alphabeta(this.evaluator, board, ply, -evaluator.infty(), evaluator.infty()).move;
@@ -33,7 +34,7 @@ public class AlphaBetaSearcher<M extends Move<M>, B extends Board<M, B>> extends
         M bestMove = null;
         for (M move : moves) {
         	board.applyMove(move);
-        	NODE_COUNT++;
+        	NODE_COUNT.addAndGet(1);
         	JamboreeSearcher.NODE_COUNT.add(1);
         	int value = -alphabeta(evaluator, board, depth - 1, -beta, -alpha).value;
         	board.undoMove();
