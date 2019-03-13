@@ -14,7 +14,7 @@ import cse332.chess.interfaces.Move;
 public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends AbstractSearcher<M, B> {
 	public static int DIVIDE_CUTOFF = 1;
     private static final ForkJoinPool POOL = new ForkJoinPool();
-    public static LongAdder NODE_COUNT = new LongAdder();
+    //public static LongAdder NODE_COUNT = new LongAdder();
     
     public M getBestMove(B board, int myTime, int opTime) {
     	/* Calculate the best move */
@@ -53,7 +53,7 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends 
 			if (move != null) { // Have child apply moves
 				B newBoard = board.copy();
 				newBoard.applyMove(move);
-				NODE_COUNT.add(1);
+				//NODE_COUNT.add(1);
 				List<M> newMoves = newBoard.generateMoves();
 				if (newMoves.isEmpty()) { 
 		    		if (newBoard.inCheck()) {

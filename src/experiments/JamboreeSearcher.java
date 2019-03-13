@@ -14,7 +14,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends 
 	public static int DIVIDE_CUTOFF = 1;
 	private static final double PERCENTAGE_SEQUENTIAL = 0.25;
 	private static final ForkJoinPool POOL = new ForkJoinPool();
-	public static LongAdder NODE_COUNT = new LongAdder();
+	//public static LongAdder NODE_COUNT = new LongAdder();
 	
 	public M getBestMove(B board, int myTime, int opTime) {
 		SearchTask<M, B> bestMoveTask = new SearchTask<M, B>(null, -1, -1, board, ply, cutoff, evaluator, -evaluator.infty(), evaluator.infty());
@@ -56,7 +56,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends 
 				if (move != null) { // If we have to apply a move
 					board = board.copy();
 					board.applyMove(move);
-					NODE_COUNT.add(1);
+					//NODE_COUNT.add(1);
 				}
 				if (depth <= cutoff) {
 					return AlphaBetaSearcher.alphabeta(evaluator, board, depth, alpha, beta);

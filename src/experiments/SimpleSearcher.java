@@ -14,7 +14,7 @@ import cse332.chess.interfaces.Move;
  */
 public class SimpleSearcher<M extends Move<M>, B extends Board<M, B>> extends
         AbstractSearcher<M, B> {
-	public static AtomicInteger NODE_COUNT = new AtomicInteger();
+	//public static AtomicInteger NODE_COUNT = new AtomicInteger();
 	
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
@@ -41,8 +41,8 @@ public class SimpleSearcher<M extends Move<M>, B extends Board<M, B>> extends
         M bestMove = null;
         for (M move : moves) {
         	board.applyMove(move);
-        	NODE_COUNT.addAndGet(1);
-        	ParallelSearcher.NODE_COUNT.add(1);
+        	//NODE_COUNT.addAndGet(1);
+        	//ParallelSearcher.NODE_COUNT.add(1);
         	int value = -minimax(evaluator, board, depth - 1).value;
         	board.undoMove();
         	if (value > bestValue) {
