@@ -11,10 +11,10 @@ import cse332.chess.interfaces.Evaluator;
 import cse332.chess.interfaces.Move;
 
 public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends AbstractSearcher<M, B> {
-	public static int DIVIDE_CUTOFF = 2;
-	//public static int NUM_PROCESSORS = 2;
+	public static int DIVIDE_CUTOFF = 4;
+	public static int NUM_PROCESSORS = 2;
 	private static final double PERCENTAGE_SEQUENTIAL = 0.25;
-	private static final ForkJoinPool POOL = new ForkJoinPool();
+	private static final ForkJoinPool POOL = new ForkJoinPool(NUM_PROCESSORS);
 	//public static LongAdder NODE_COUNT = new LongAdder();
 	
 	public M getBestMove(B board, int myTime, int opTime) {
