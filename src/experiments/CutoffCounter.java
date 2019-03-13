@@ -26,18 +26,18 @@ public class CutoffCounter {
     
 	@SuppressWarnings({ "resource", "static-access" })
 	public static void main(String[] args) throws FileNotFoundException {
-        //ParallelSearcher<ArrayMove, ArrayBoard> searcher = new ParallelSearcher<>();
-        JamboreeSearcher<ArrayMove, ArrayBoard> searcher = new JamboreeSearcher<>();
+        ParallelSearcher<ArrayMove, ArrayBoard> searcher = new ParallelSearcher<>();
+        //JamboreeSearcher<ArrayMove, ArrayBoard> searcher = new JamboreeSearcher<>();
         
         int ply = 5;
         for (int divideCutoff = 1; divideCutoff <= 4; divideCutoff++) {
         	Scanner boards = new Scanner(new File("BoardInputs.txt"));
             int numBoard = 0;
-            double sum = 0;
 	        while (boards.hasNextLine()) {
 	        	numBoard++;
 	        	String input = boards.nextLine().substring(5); // Which board state is tested: 1-start, 2-mid ish, 3-end ish
 	        	searcher.DIVIDE_CUTOFF = divideCutoff;
+	        	double sum = 0;
 	        	for (int i = 0; i < TRIAL_COUNT; i++) {
 		        	long startTime = System.nanoTime();
 		        	printMove(input, searcher, ply, ply / 2); // Cutoff is ply / 2
@@ -46,8 +46,8 @@ public class CutoffCounter {
 		        	sum += elapsedTime;
 		        	System.out.println("Board " + numBoard + " took " + elapsedTime / 1000000 + " milliseconds for divide cutoff " + divideCutoff + ".");
 	        	}
-	        	System.out.println();
 	        	System.out.println("Average ms/board is: " + sum / TRIAL_COUNT / 1000000);
+	        	System.out.println();
 	        }
         }
     }

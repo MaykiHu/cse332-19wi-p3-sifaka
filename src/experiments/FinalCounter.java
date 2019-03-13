@@ -33,10 +33,10 @@ public class FinalCounter {
         Scanner boards = new Scanner(new File("BoardInputs.txt"));
         int numBoard = 0;
         int ply = 5;
-        double sum = 0;
         while (boards.hasNextLine()) {
         	numBoard++;
         	String input = boards.nextLine().substring(5); // Which board state is tested: 1-start, 2-mid ish, 3-end ish
+        	double sum = 0;
         	for (int i = 0; i < TRIAL_COUNT; i++) {
 	        	long startTime = System.nanoTime();
 	        	printMove(input, searcher, ply, ply / 2); // Cutoff is ply / 2
@@ -45,8 +45,8 @@ public class FinalCounter {
 	        	sum += elapsedTime;
 	        	System.out.println("Board " + numBoard + " took " + elapsedTime / 1000000 + " milliseconds.");
         	}
-        	System.out.println();
         	System.out.println("Average ms/board is: " + sum / TRIAL_COUNT / 1000000);
+        	System.out.println();
         }
     }
 }
