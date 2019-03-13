@@ -25,31 +25,43 @@ public class ProcessorCounter {
     
 	@SuppressWarnings({ "resource", "static-access" })
 	public static void main(String[] args) throws FileNotFoundException {
-        //ParallelSearcher<ArrayMove, ArrayBoard> searcher = new ParallelSearcher<>();
-        JamboreeSearcher<ArrayMove, ArrayBoard> searcher = new JamboreeSearcher<>();
+        ParallelSearcher<ArrayMove, ArrayBoard> searcher = new ParallelSearcher<>();
+        //JamboreeSearcher<ArrayMove, ArrayBoard> searcher = new JamboreeSearcher<>();
         
         int ply = 5;
-        int numProcessors = 2;
-        while (numProcessors <= 32) {
-        	Scanner boards = new Scanner(new File("BoardInputs.txt"));
-            int numBoard = 0;
-	        while (boards.hasNextLine()) {
-	        	numBoard++;
-	        	String input = boards.nextLine().substring(5); // Which board state is tested: 1-start, 2-mid ish, 3-end ish
-	        	searcher.NUM_PROCESSORS = numProcessors;
-	        	long startTime = System.nanoTime();
-	        	printMove(input, searcher, ply, ply / 2); // Cutoff is ply / 2
-	        	long endTime = System.nanoTime();
-	        	long elapsedTime = endTime - startTime;
-	        	System.out.println("Board " + numBoard + " took " + elapsedTime / 1000000 + " milliseconds for processor count: " + numProcessors + ".");
-	        }
-	        if (numProcessors == 2) {
-        		numProcessors = 16;
-        	} else if (numProcessors == 16) {
-        		numProcessors = 32;
-        	} else if (numProcessors == 32) {
-        		numProcessors = 100; // Exit
-        	}
+        int numProcessors = 24;
+//        while (numProcessors <= 32) {
+//        	Scanner boards = new Scanner(new File("BoardInputs.txt"));
+//            int numBoard = 0;
+//	        while (boards.hasNextLine()) {
+//	        	numBoard++;
+//	        	String input = boards.nextLine().substring(5); // Which board state is tested: 1-start, 2-mid ish, 3-end ish
+//	        	searcher.NUM_PROCESSORS = numProcessors;
+//	        	long startTime = System.nanoTime();
+//	        	printMove(input, searcher, ply, ply / 2); // Cutoff is ply / 2
+//	        	long endTime = System.nanoTime();
+//	        	long elapsedTime = endTime - startTime;
+//	        	System.out.println("Board " + numBoard + " took " + elapsedTime / 1000000 + " milliseconds for processor count: " + numProcessors + ".");
+//	        }
+//	        if (numProcessors == 2) {
+//        		numProcessors = 16;
+//        	} else if (numProcessors == 16) {
+//        		numProcessors = 32;
+//        	} else if (numProcessors == 32) {
+//        		numProcessors = 100; // Exit
+//        	}
+//        }
+        Scanner boards = new Scanner(new File("BoardInputs.txt"));
+        int numBoard = 0;
+        while (boards.hasNextLine()) {
+        	numBoard++;
+        	String input = boards.nextLine().substring(5); // Which board state is tested: 1-start, 2-mid ish, 3-end ish
+        	searcher.NUM_PROCESSORS = numProcessors;
+        	long startTime = System.nanoTime();
+        	printMove(input, searcher, ply, ply / 2); // Cutoff is ply / 2
+        	long endTime = System.nanoTime();
+        	long elapsedTime = endTime - startTime;
+        	System.out.println("Board " + numBoard + " took " + elapsedTime / 1000000 + " milliseconds for processor count: " + numProcessors + ".");
         }
     }
 }
