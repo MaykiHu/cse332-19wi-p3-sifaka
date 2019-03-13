@@ -30,7 +30,7 @@ public class CutoffCounter {
         
         int ply = 5;
         for (int divideCutoff = 1; divideCutoff <= 4; divideCutoff++) {
-        	Scanner boards = new Scanner(new File("src/BoardInputs.txt"));
+        	Scanner boards = new Scanner(new File("BoardInputs.txt"));
             int numBoard = 0;
 	        while (boards.hasNextLine()) {
 	        	numBoard++;
