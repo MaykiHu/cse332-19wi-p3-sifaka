@@ -10,7 +10,8 @@ import chess.game.SimpleEvaluator;
 import cse332.chess.interfaces.Searcher;
 
 public class CutoffCounter {
-
+	private static int TRIAL_COUNT = 3;
+	
     public static ArrayMove getBestMove(String fen, Searcher<ArrayMove, ArrayBoard> searcher, int depth, int cutoff) { 
         searcher.setDepth(depth);
         searcher.setCutoff(cutoff);
@@ -28,19 +29,25 @@ public class CutoffCounter {
         //ParallelSearcher<ArrayMove, ArrayBoard> searcher = new ParallelSearcher<>();
         JamboreeSearcher<ArrayMove, ArrayBoard> searcher = new JamboreeSearcher<>();
         
-        int ply = 5;
+        int ply = 2;
         for (int divideCutoff = 1; divideCutoff <= 4; divideCutoff++) {
-        	Scanner boards = new Scanner(new File("BoardInputs.txt"));
+        	Scanner boards = new Scanner(new File("src/BoardInputs.txt"));
             int numBoard = 0;
+            double sum = 0;
 	        while (boards.hasNextLine()) {
 	        	numBoard++;
 	        	String input = boards.nextLine().substring(5); // Which board state is tested: 1-start, 2-mid ish, 3-end ish
 	        	searcher.DIVIDE_CUTOFF = divideCutoff;
-	        	long startTime = System.nanoTime();
-	        	printMove(input, searcher, ply, ply / 2); // Cutoff is ply / 2
-	        	long endTime = System.nanoTime();
-	        	long elapsedTime = endTime - startTime;
-	        	System.out.println("Board " + numBoard + " took " + elapsedTime / 1000000 + " milliseconds for divide cutoff " + divideCutoff + ".");
+	        	for (int i = 0; i < TRIAL_COUNT; i++) {
+		        	long startTime = System.nanoTime();
+		        	printMove(input, searcher, ply, ply / 2); // Cutoff is ply / 2
+		        	long endTime = System.nanoTime();
+		        	long elapsedTime = endTime - startTime;
+		        	sum += elapsedTime;
+		        	System.out.println("Board " + numBoard + " took " + elapsedTime / 1000000 + " milliseconds for divide cutoff " + divideCutoff + ".");
+	        	}
+	        	System.out.println();
+	        	System.out.println("Average ms/board is: " + sum / TRIAL_COUNT / 1000000);
 	        }
         }
     }
