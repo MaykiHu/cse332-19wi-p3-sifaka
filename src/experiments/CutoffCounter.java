@@ -26,8 +26,8 @@ public class CutoffCounter {
     
 	@SuppressWarnings({ "resource", "static-access" })
 	public static void main(String[] args) throws FileNotFoundException {
-        ParallelSearcher<ArrayMove, ArrayBoard> searcher = new ParallelSearcher<>();
-        //JamboreeSearcher<ArrayMove, ArrayBoard> searcher = new JamboreeSearcher<>();
+        //ParallelSearcher<ArrayMove, ArrayBoard> searcher = new ParallelSearcher<>();
+        JamboreeSearcher<ArrayMove, ArrayBoard> searcher = new JamboreeSearcher<>();
         
         int ply = 5;
         for (int divideCutoff = 1; divideCutoff <= 4; divideCutoff++) {
