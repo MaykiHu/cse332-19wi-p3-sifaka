@@ -23,22 +23,25 @@ public class CutoffCounter {
         getBestMove(fen, searcher, depth, cutoff);
     }
     
-	@SuppressWarnings("resource")
+	@SuppressWarnings({ "resource", "static-access" })
 	public static void main(String[] args) throws FileNotFoundException {
         ParallelSearcher<ArrayMove, ArrayBoard> searcher = new ParallelSearcher<>();
         //JamboreeSearcher<ArrayMove, ArrayBoard> searcher = new JamboreeSearcher<>();
         
-        Scanner boards = new Scanner(new File("src/BoardInputs.txt"));
-        int numBoard = 0;
         int ply = 5;
-        while (boards.hasNextLine()) {
-        	numBoard++;
-        	String input = boards.nextLine().substring(5); // Which board state is tested: 1-start, 2-mid ish, 3-end ish
-        	long startTime = System.nanoTime();
-        	printMove(input, searcher, ply, ply / 2); // Cutoff is ply / 2
-        	long endTime = System.nanoTime();
-        	long elapsedTime = endTime - startTime;
-        	System.out.println("Board " + numBoard + " took " + elapsedTime / 1000000 + " milliseconds.");
+        for (int divideCutoff = 1; divideCutoff <= 4; divideCutoff++) {
+        	Scanner boards = new Scanner(new File("src/BoardInputs.txt"));
+            int numBoard = 0;
+	        while (boards.hasNextLine()) {
+	        	numBoard++;
+	        	String input = boards.nextLine().substring(5); // Which board state is tested: 1-start, 2-mid ish, 3-end ish
+	        	searcher.DIVIDE_CUTOFF = divideCutoff;
+	        	long startTime = System.nanoTime();
+	        	printMove(input, searcher, ply, ply / 2); // Cutoff is ply / 2
+	        	long endTime = System.nanoTime();
+	        	long elapsedTime = endTime - startTime;
+	        	System.out.println("Board " + numBoard + " took " + elapsedTime / 1000000 + " milliseconds for divide cutoff " + divideCutoff + ".");
+	        }
         }
     }
 }
