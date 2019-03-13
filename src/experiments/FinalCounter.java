@@ -23,14 +23,14 @@ public class FinalCounter {
     public static void printMove(String fen, Searcher<ArrayMove, ArrayBoard> searcher, int depth, int cutoff) {
         getBestMove(fen, searcher, depth, cutoff);
     }
-    @SuppressWarnings({ "resource", "static-access" })
+	@SuppressWarnings("resource")
 	public static void main(String[] args) throws FileNotFoundException {
         SimpleSearcher<ArrayMove, ArrayBoard> searcher = new SimpleSearcher<>();
         //ParallelSearcher<ArrayMove, ArrayBoard> searcher = new ParallelSearcher<>();
         //AlphaBetaSearcher<ArrayMove, ArrayBoard> searcher = new AlphaBetaSearcher<>();
         //JamboreeSearcher<ArrayMove, ArrayBoard> searcher = new JamboreeSearcher<>();
         
-        Scanner boards = new Scanner(new File("src/BoardInputs.txt"));
+        Scanner boards = new Scanner(new File("BoardInputs.txt"));
         int numBoard = 0;
         int ply = 5;
         double sum = 0;

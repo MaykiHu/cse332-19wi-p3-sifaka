@@ -29,10 +29,10 @@ public class ProcessorCounter {
         ParallelSearcher<ArrayMove, ArrayBoard> searcher = new ParallelSearcher<>();
         //JamboreeSearcher<ArrayMove, ArrayBoard> searcher = new JamboreeSearcher<>();
         
-        int ply = 2;
+        int ply = 5;
         int numProcessors = 2;
         while (numProcessors <= 32) {
-        	Scanner boards = new Scanner(new File("src/BoardInputs.txt"));
+        	Scanner boards = new Scanner(new File("BoardInputs.txt"));
             int numBoard = 0;
             double sum = 0;
 	        while (boards.hasNextLine()) {

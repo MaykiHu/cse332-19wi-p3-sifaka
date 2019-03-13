@@ -29,9 +29,9 @@ public class CutoffCounter {
         //ParallelSearcher<ArrayMove, ArrayBoard> searcher = new ParallelSearcher<>();
         JamboreeSearcher<ArrayMove, ArrayBoard> searcher = new JamboreeSearcher<>();
         
-        int ply = 2;
+        int ply = 5;
         for (int divideCutoff = 1; divideCutoff <= 4; divideCutoff++) {
-        	Scanner boards = new Scanner(new File("src/BoardInputs.txt"));
+        	Scanner boards = new Scanner(new File("BoardInputs.txt"));
             int numBoard = 0;
             double sum = 0;
 	        while (boards.hasNextLine()) {
