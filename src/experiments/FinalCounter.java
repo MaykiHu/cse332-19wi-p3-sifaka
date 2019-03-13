@@ -27,8 +27,8 @@ public class FinalCounter {
 	public static void main(String[] args) throws FileNotFoundException {
         //SimpleSearcher<ArrayMove, ArrayBoard> searcher = new SimpleSearcher<>();
         //ParallelSearcher<ArrayMove, ArrayBoard> searcher = new ParallelSearcher<>();
-        AlphaBetaSearcher<ArrayMove, ArrayBoard> searcher = new AlphaBetaSearcher<>();
-        //JamboreeSearcher<ArrayMove, ArrayBoard> searcher = new JamboreeSearcher<>();
+        //AlphaBetaSearcher<ArrayMove, ArrayBoard> searcher = new AlphaBetaSearcher<>();
+        JamboreeSearcher<ArrayMove, ArrayBoard> searcher = new JamboreeSearcher<>();
         
         Scanner boards = new Scanner(new File("BoardInputs.txt"));
         int numBoard = 0;
