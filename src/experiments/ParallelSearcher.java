@@ -13,7 +13,7 @@ import cse332.chess.interfaces.Move;
 
 public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends AbstractSearcher<M, B> {
 	public static int DIVIDE_CUTOFF = 3;
-	public static int NUM_PROCESSORS = 2;
+	public static int NUM_PROCESSORS = 16;
     private static final ForkJoinPool POOL = new ForkJoinPool(NUM_PROCESSORS);
     //public static LongAdder NODE_COUNT = new LongAdder();
     
