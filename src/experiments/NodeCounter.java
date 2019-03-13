@@ -38,7 +38,7 @@ public class NodeCounter {
         		printMove(input, searcher, ply, ply / 2); // Cutoff is ply / 2
         	}
         	//System.out.println("Average nodes visited: " + (int)((double) searcher.NODE_COUNT.get() / numInputs)); // Sequential
-        	System.out.println("Average nodes visited: " + (int)(searcher.NODE_COUNT.doubleValue() / numInputs)); // Parallel
+        	//System.out.println("Average nodes visited: " + (int)(searcher.NODE_COUNT.doubleValue() / numInputs)); // Parallel
         }
     }
 }
